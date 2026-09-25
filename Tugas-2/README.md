@@ -17,6 +17,8 @@ Program Studi Teknik Informatika - Institut Teknologi Sumatera (ITERA)
 - `App.kt`: Antarmuka Compose Multiplatform yang menampilkan data stream di Android.
 
 ## Cara Menjalankan Unit Test
-Jalankan pengujian logika pada target JVM melalui terminal:
+
+Jalankan perintah berikut di terminal untuk mengeksekusi unit test sekaligus menampilkan log keluaran stream berita (`println`) di terminal:
+
 ```bash
-./gradlew :shared:jvmTest
+./gradlew :shared:jvmTest --rerun-tasks --info
