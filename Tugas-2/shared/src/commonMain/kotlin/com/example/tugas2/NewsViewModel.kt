@@ -11,23 +11,39 @@ class NewsViewModel(
     private val scope: CoroutineScope
 ) {
 
-    // StateFlow jumlah berita dibaca[cite: 1]
+    // 1. MutableStateFlow (private, hanya bisa diubah dari dalam ViewModel)
     private val _readCount = MutableStateFlow(0)
+
+    // 2. Expose sebagai StateFlow read-only menggunakan .asStateFlow()
     val readCount: StateFlow<Int> = _readCount.asStateFlow()
 
     private val _selectedArticle = MutableStateFlow<NewsArticle?>(null)
     val selectedArticle: StateFlow<NewsArticle?> = _selectedArticle.asStateFlow()
 
+    // Increment (Tambah 1)
     fun markAsRead() {
-        _readCount.value += 1
+        _readCount.value++
     }
 
+    // Decrement (Kurangi 1, minimal 0)
+    fun decrementReadCount() {
+        if (_readCount.value > 0) {
+            _readCount.value--
+        }
+    }
+
+    // Reset ke 0
+    fun resetReadCount() {
+        _readCount.value = 0
+    }
+
+    // Coroutine untuk fetch detail artikel
     fun loadArticleDetail(articleId: Int) {
         scope.launch {
             val article = repository.fetchArticleDetailAsync(articleId)
             _selectedArticle.value = article
             if (article != null) {
-                markAsRead()
+                markAsRead() // Menambah jumlah dibaca
             }
         }
     }

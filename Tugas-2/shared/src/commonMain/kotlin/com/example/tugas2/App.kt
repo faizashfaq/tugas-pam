@@ -1,10 +1,13 @@
 package com.example.tugas2
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,16 +27,19 @@ fun App() {
         val scope = rememberCoroutineScope()
         val viewModel = remember { NewsViewModel(repository, scope) }
 
-        // Mengambil StateFlow jumlah berita dibaca
+        // Menerima perubahan StateFlow secara reactive
         val readCount by viewModel.readCount.collectAsState()
 
-        // List untuk menampung stream berita yang masuk
+        // List menampung stream berita
         val newsList = remember { mutableStateListOf<String>() }
 
-        // Collect Flow berita di UI Android
+        // Collect Flow berita & otomatis tambah counter saat berita masuk
         LaunchedEffect(Unit) {
             repository.getFilteredNewsStream("Teknologi").collect { formattedNews ->
                 newsList.add(formattedNews)
+
+                // TAMBAHKAN BARIS INI: Panggil ViewModel untuk menambah counter dibaca
+                viewModel.markAsRead()
             }
         }
 
@@ -59,12 +65,18 @@ fun App() {
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Menampilkan stream berita
+            // Tampilkan list berita
             newsList.forEach { news ->
-                Text(
-                    text = news,
-                    modifier = Modifier.padding(vertical = 4.dp)
-                )
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp)
+                ) {
+                    Text(
+                        text = news,
+                        modifier = Modifier.padding(12.dp)
+                    )
+                }
             }
         }
     }
